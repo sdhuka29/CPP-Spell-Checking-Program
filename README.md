@@ -16,7 +16,6 @@ potash
 Enter Your Choice: e
 
 Enter The Word Which You Want To Search: potata
-
 potate
 potato
 patata
@@ -35,7 +34,6 @@ Choices:
 Enter Your Choice: e
 
 Enter The Word Which You Want To Search: cat
-
 cast
 Bat
 coat
