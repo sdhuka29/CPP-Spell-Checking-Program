@@ -84,14 +84,6 @@ class Dictionary {
         return distances;
     }
 
-    // // This method calls the get_distance method and return the vector of pair objects <str, int>
-    // vector<pair<string, int>> get_matching_words (string input, int start, int end) {
-    //     vector<pair<string, int>> temp;
-    //     transform(input.begin(), input.end(), input.begin(), ::tolower);
-    //     temp = get_distances(input, start, end);
-    //     return temp;        
-    // }
-
     // Return the total size of vector named _words
     int get_words_size () {
         return _words.size();
