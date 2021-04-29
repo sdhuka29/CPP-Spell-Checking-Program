@@ -25,33 +25,11 @@ using namespace std;
 Dictionary *Dictionary::instance = 0;
 
 // Display top 10 best matches from the dictionary in order of relevance. 
-void display_matching_words(string input) {
+void display_matching_words(string input, const vector<pair<int, int>> words_size_range) {
     Dictionary *d = d->getInstance ();
 
-    vector<pair<int, int>> words_size_range;
     vector<future<vector<pair<string, int>>>> data;
     vector<pair<string, int>> distances;
-
-    int thread_size = 1;
-    int words_size = d->get_words_size();
-    int remaining_words_size = d->get_words_size();
-    int divisor =  words_size >= 8 ? 8 : words_size;
-
-    // Calculate how many threads we need here and also determine how many words to be passed to each thread for processing
-    thread_size = floor(d->get_words_size() / divisor);
-    remaining_words_size = words_size - (thread_size * divisor);
-    divisor = remaining_words_size > 0 ? divisor - 1 : divisor;
-    for (int i = 0; i < divisor; i += 1) {
-        int start = i*thread_size;
-        int end = (i+1)*thread_size;
-        words_size_range.push_back(make_pair(start, end));
-    }
-
-    if (remaining_words_size > 0) {
-        int start = divisor * thread_size;
-        int end = (divisor + 1) * thread_size + remaining_words_size;
-        words_size_range.push_back(make_pair(start, end));
-    }
 
     // Call a method named get_matching_words asychronously and load the future objects into vector named data
     for (auto it = words_size_range.begin(); it < words_size_range.end(); it += 1) {
@@ -64,19 +42,18 @@ void display_matching_words(string input) {
         distances.insert(distances.end(), v.begin(), v.end());
     }
 
-    // Sort the vector named distances by distance between two strings means the minimum number of edits needed to transform
-    // one string into the other, with the edit operations i.e; insertion, deletion, or substitution of a single character
-    sort(distances.begin(), distances.end(), [](pair<string, int> a, pair<string, int> b) { return a.second < b.second; });
+    // Do the partial sort the vector named distances to get the first 10 smallest distances which is between two strings means the minimum number of edits
+    // needed to transform one string into the other, with the edit operations i.e; insertion, deletion, or substitution of a single character
+    int length = min(static_cast<int>(distances.size()), 10);
+    partial_sort(distances.begin(), distances.begin() + length, distances.end(), [](pair<string, int> a, pair<string, int> b) { return a.second < b.second; });
 
     // Display top 10 best matches
-    int length = min(static_cast<int>(distances.size()), 10);
     for (auto it = distances.begin(); it < distances.begin() + length; it += 1) {
         cout << it->first << endl;
     }
     cout << endl;
 
     // Clear all vectors
-    words_size_range.clear();
     data.clear();
     distances.clear();
 }
@@ -87,6 +64,29 @@ int main(){
     bool quitting = false;
 
     if (d->get_words_size() > 0) {
+        int thread_size = 1;
+        int words_size = d->get_words_size();
+        int remaining_words_size = d->get_words_size();
+        int divisor =  words_size >= 8 ? 8 : words_size;
+
+        vector<pair<int, int>> words_size_range;
+
+        // Calculate how many threads we need here and also determine how many words to be passed to each thread for processing
+        thread_size = floor(d->get_words_size() / divisor);
+        remaining_words_size = words_size - (thread_size * divisor);
+        divisor = remaining_words_size > 0 ? divisor - 1 : divisor;
+        for (int i = 0; i < divisor; i += 1) {
+            int start = i*thread_size;
+            int end = (i+1)*thread_size;
+            words_size_range.push_back(make_pair(start, end));
+        }
+
+        if (remaining_words_size > 0) {
+            int start = divisor * thread_size;
+            int end = (divisor + 1) * thread_size + remaining_words_size;
+            words_size_range.push_back(make_pair(start, end));
+        }
+
         do {
             cout << "Choices:" << endl
                 << "1. Any Key For Searching 10 Closest Matches" << endl
@@ -104,7 +104,7 @@ int main(){
                 cout << endl;
 
                 // Display matching words closest to the input
-                display_matching_words(input);
+                display_matching_words(input, words_size_range);
             }
         } while (!quitting);
     } else {
