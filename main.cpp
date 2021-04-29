@@ -25,7 +25,7 @@ using namespace std;
 Dictionary *Dictionary::instance = 0;
 
 // Display top 10 best matches from the dictionary in order of relevance. 
-void display_matching_words(string input, const vector<pair<int, int>> words_size_range) {
+void display_matching_words(string input, const vector<pair<int, int>> &words_size_range) {
     Dictionary *d = d->getInstance ();
 
     vector<future<vector<pair<string, int>>>> data;
