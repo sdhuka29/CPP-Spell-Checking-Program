@@ -49,7 +49,7 @@ class Dictionary {
     // one string into the other, with the edit operations i.e; insertion, deletion, or substitution of a single character
     // Reference: https://www.tutorialspoint.com/cplusplus-program-to-implement-levenshtein-distance-computing-algorithm
     vector<pair<string, int>> get_distances (const string &input, int start, int end) {
-        int i, j, l1, l2, t, track;
+        int i, j, l1, l2, t, track, length;
         int dist[50][50];
         vector<pair<string, int>> distances;
 
@@ -80,6 +80,10 @@ class Dictionary {
 
             distances.push_back(make_pair(*it, dist[l2][l1]));
         }
+
+        // Find up to top 10 best matches from the supplied dictionary words
+        length = min(static_cast<int>(distances.size()), 10);
+        partial_sort(distances.begin(), distances.begin() + length, distances.end(), [](pair<string, int> a, pair<string, int> b) { return a.second < b.second; });
 
         return distances;
     }

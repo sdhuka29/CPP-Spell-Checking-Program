@@ -9,7 +9,6 @@
 //       ...
 //       (10 closest matches in order of relevance)
 //       ...
- 
 
 #include <iostream>
 #include <string>
